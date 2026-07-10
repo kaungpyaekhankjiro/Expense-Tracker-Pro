@@ -15,11 +15,16 @@ body {
     color: var(--text);
 }
 
+/* ❌ ဒီအကွက်ဟောင်းနေရာမှာ အောက်ကအသစ်ကို အစားထိုးပါ */
 .header {
     background-color: var(--primary);
     color: white;
     text-align: center;
     padding: 15px 0;
+    
+    /* 📱 iOS Full Screen တွင် အပေါ်ဆုံး Status Bar နှင့် စာသားမထပ်စေရန် ဤ ၂ ကြောင်း ထည့်ပါ */
+    padding-top: calc(15px + env(safe-area-inset-top));
+    padding-bottom: 15px;
 }
 
 .container {
