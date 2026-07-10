@@ -86,10 +86,10 @@ button {
 
 #addBtn { background-color: var(--success); }
 
+/* ❌ ဒီ table နဲ့ th, td အကွက်ဟောင်းတွေနေရာမှာ အောက်ကကောင်ကို အစားထိုးပါ */
 .table-responsive {
     width: 100%;
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
+    overflow-x: hidden; /* ဘေးတိုက် ပွတ်ဆွဲစရာမလိုအောင် ပိတ်လိုက်သည် */
     margin-bottom: 20px;
     border-radius: 8px;
     box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
@@ -97,21 +97,39 @@ button {
 
 table {
     width: 100%;
-    min-width: 450px;
+    table-layout: fixed; /* ကော်လံအကျယ်တွေကို ပုံသေသတ်မှတ်ရန် ခိုင်းစေခြင်း */
     border-collapse: collapse;
     background: white;
 }
 
+/* 📱 ဖုန်းမျက်နှာပြင်ထဲ ကွက်တိဝင်အောင် တစ်ကော်လံချင်းစီကို အချိုးချလိုက်ခြင်း */
+th:nth-child(1), td:nth-child(1) { width: 12%; } /* အမှတ်စဉ် */
+th:nth-child(2), td:nth-child(2) { width: 28%; } /* ရက်စွဲ */
+th:nth-child(3), td:nth-child(3) { width: 32%; } /* အကြောင်းအရာ */
+th:nth-child(4), td:nth-child(4) { width: 28%; } /* ကုန်ကျငွေ */
+
 th, td {
-    padding: 14px 12px;
+    padding: 12px 6px; /* ဘေး space ကို နည်းနည်းလျှော့လိုက်သည် */
     text-align: left;
     border-bottom: 1px solid #e2e8f0;
-    font-size: 15px;
+    font-size: 13px; /* လူကြီးတွေ မြင်ရလွယ်ပြီး ဖုန်းထဲဆံ့မယ့် အနေတော် Size */
+    word-break: break-word; /* စာသားရှည်ရင် အောက်လိုင်း ဆင်းပေးရန် */
 }
 
-th { background-color: #cbd5e1; font-weight: bold; }
-td:nth-child(4) { text-align: right; font-weight: bold; }
-td:nth-child(1), td:nth-child(2) { text-align: center; }
+th { 
+    background-color: #cbd5e1; 
+    font-weight: bold; 
+    text-align: center;
+}
+
+td:nth-child(4) { 
+    text-align: right; 
+    font-weight: bold; 
+}
+
+td:nth-child(1), td:nth-child(2) { 
+    text-align: center; 
+}
 
 /* 🖱️ ရွေးချယ်ထားသော စာကြောင်းအား ကွဲပြားစွာ ပြသရန် */
 tr.selected-row {
