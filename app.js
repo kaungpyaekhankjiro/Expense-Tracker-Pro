@@ -32,7 +32,12 @@ function addExpense() {
     }
 
     // ရက်စွဲရယူခြင်း
-    let today = new Date().toISOString().split('T')[0];
+    // မိမိစက်၏ Timezone အမှန်အတိုင်း ရက်စွဲရယူခြင်း
+    let localDate = new Date();
+    let year = localDate.getFullYear();
+    let month = String(localDate.getMonth() + 1).padStart(2, '0');
+    let day = String(localDate.getDate()).padStart(2, '0');
+    let today = `${year}-${month}-${day}`;
 
     // Data အသစ်ကို Array ထဲထည့်ခြင်း
     expenses.push({
