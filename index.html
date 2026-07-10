@@ -7,6 +7,80 @@
     <title>Premium Expense Tracker</title>
     <link rel="stylesheet" href="style.css">
 </head>
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Premium Expense Tracker</title>
+
+    <!-- 📱 ဖုန်းပေါ်တွင် Full Screen (Mobile App Mode) ဖြစ်စေရန် ဤကုဒ်များကို ထည့်ပါ -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-title" content="ExpensePro">
+
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <div class="header">
+        <h2>💰 နေ့စဉ်အသုံးစရိတ် မှတ်တမ်း</h2>
+    </div>
+
+    <div class="container">
+        <!-- Input Form -->
+        <div class="form-card">
+            <h3>အချက်အလက်အသစ်ထည့်ရန်</h3>
+            <div class="input-group">
+                <label>အသုံးပြုသည့် အကြောင်းအရာ:</label>
+                <input type="text" id="titleInput" placeholder="ဥပမာ - စျေးဝယ်ခြင်း">
+            </div>
+            <div class="input-group">
+                <label>ကုန်ကျငွေ ပမာဏ:</label>
+                <div class="amount-row">
+                    <input type="text" id="amountInput" placeholder="ဥပမာ - 100k သို့မဟုတ် 50000">
+                    <select id="currencyInput">
+                        <option value="Ks">Ks</option>
+                        <option value="Baht">Baht</option>
+                        <option value="USD">USD</option>
+                        <option value="SGD">SGD</option>
+                        <option value="EUR">EUR</option>
+                        <option value="JPY">JPY</option>
+                    </select>
+                </div>
+            </div>
+            <button id="addBtn" onclick="addExpense()">➕ အသစ်ထည့်မည် (Add)</button>
+        </div>
+
+        <!-- Table View -->
+        <div class="table-responsive">
+            <table id="expenseTable">
+                <thead>
+                    <tr>
+                        <th>အမှတ်စဉ်</th>
+                        <th>ရက်စွဲ</th>
+                        <th>အကြောင်းအရာ</th>
+                        <th>ကုန်ကျငွေ</th>
+                        <th>လုပ်ဆောင်ချက်</th>
+                    </tr>
+                </thead>
+                <tbody id="expenseList"></tbody>
+            </table>
+        </div>
+
+        <!-- Total Section -->
+        <h3>📊 စုစုပေါင်းကုန်ကျငွေစာရင်းများ -</h3>
+        <div class="total-card" id="totalArea">
+            <!-- Totals will appear here dynamically -->
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+
+</html>
 
 <body>
     <div class="header">
