@@ -1,23 +1,38 @@
 let expenses = JSON.parse(localStorage.getItem('expenses')) || [];
-let selectedExpenseId = null; // ရွေးချယ်ထားသော ID ကို မှတ်ရန်
+let selectedExpenseId = null;
 
 function saveToStorage() {
     localStorage.setItem('expenses', JSON.stringify(expenses));
-    selectedExpenseId = null; // Reset
+    selectedExpenseId = null;
     document.getElementById('floatingDeleteBtn').style.display = 'none';
     renderExpenses();
+    setDefaultDate(); // စာရင်းသွင်းပြီးရင် ရက်စွဲကို ဒီနေ့ရက်စွဲအဖြစ် ပြန်ထားရန်
+}
+
+// 📅 ဖုန်းရဲ့ လက်ရှိ Local ရက်စွဲအတိုင်း (YYYY-MM-DD) ကွက်တိထွက်အောင် ပြင်ဆင်ထားသည့်အပိုင်း
+function setDefaultDate() {
+    const dateInput = document.getElementById('dateInput');
+    
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, '0');
+    const day = String(now.getDate()).padStart(2, '0');
+    
+    dateInput.value = `${year}-${month}-${day}`;
 }
 
 function addExpense() {
     const titleInput = document.getElementById('titleInput');
     const amountInput = document.getElementById('amountInput');
     const currencyInput = document.getElementById('currencyInput');
+    const dateInput = document.getElementById('dateInput');
 
     let title = titleInput.value.trim();
     let amountStr = amountInput.value.trim().toLowerCase();
     let currency = currencyInput.value;
+    let selectedDate = dateInput.value;
 
-    if (title === "" || amountStr === "") {
+    if (title === "" || amountStr === "" || selectedDate === "") {
         alert("အချက်အလက် အကုန်ဖြည့်ပါဦးဗျာ။");
         return;
     }
@@ -32,14 +47,12 @@ function addExpense() {
         return;
     }
 
-    let today = new Date().toISOString().split('T')[0];
-
     expenses.push({
         id: Date.now(),
         title: title,
         amount: amount,
         currency: currency,
-        date: today
+        date: selectedDate
     });
 
     titleInput.value = "";
@@ -47,20 +60,17 @@ function addExpense() {
     saveToStorage();
 }
 
-// ဇယားထဲက တစ်ကြောင်းကို နှိပ်လျှင် Select ဖြစ်စေပြီး Delete ခလုတ် ပြသရန်
 function selectRow(id, rowElement) {
-    // အရင်ရွေးထားတဲ့ စာကြောင်းရှိရင် Highlight ဖြုတ်
     const allRows = document.querySelectorAll('#expenseList tr');
     allRows.forEach(r => r.classList.remove('selected-row'));
 
-    // လက်ရှိနှိပ်လိုက်တဲ့ ID က အရင် ID နဲ့ အတူတူပဲဆိုရင် Deselect လုပ်
     if (selectedExpenseId === id) {
         selectedExpenseId = null;
         document.getElementById('floatingDeleteBtn').style.display = 'none';
     } else {
         selectedExpenseId = id;
         rowElement.classList.add('selected-row');
-        document.getElementById('floatingDeleteBtn').style.display = 'block'; // ဖျက်ရန်ခလုတ်ပြမည်
+        document.getElementById('floatingDeleteBtn').style.display = 'block';
     }
 }
 
@@ -84,7 +94,6 @@ function renderExpenses() {
     expenses.forEach((exp, index) => {
         let row = document.createElement('tr');
         row.style.cursor = 'pointer';
-        // စာကြောင်းကို နှိပ်လျှင် Select လုပ်ခိုင်းသည်
         row.onclick = function() { selectRow(exp.id, this); };
         
         row.innerHTML = `
@@ -110,4 +119,6 @@ function renderExpenses() {
     }
 }
 
+// App စတင်ချိန်တွင် Run ပေးမည့်အပိုင်း
+setDefaultDate();
 renderExpenses();
