@@ -26,6 +26,13 @@
                 <label>အသုံးပြုသည့် အကြောင်းအရာ:</label>
                 <input type="text" id="titleInput" placeholder="ဥပမာ - စျေးဝယ်ခြင်း">
             </div>
+            
+            <!-- 📅 ရက်စွဲရွေးချယ်ရန် အကွက်အသစ် (ဤအကွက်မရှိလျှင် Add ခလုတ် နှိပ်မရပါ) -->
+            <div class="input-group">
+                <label>ရက်စွဲရွေးချယ်ရန်:</label>
+                <input type="date" id="dateInput">
+            </div>
+            
             <div class="input-group">
                 <label>ကုန်ကျငွေ ပမာဏ:</label>
                 <div class="amount-row">
@@ -65,7 +72,7 @@
         </div>
     </div>
 
-    <!-- 🗑️ ညာဘက်အောက်ထောင့်တွင် သီးသန့်ပေါ်လာမည့် Floating Delete Button -->
+    <!-- 🗑️ Floating Delete Button -->
     <button id="floatingDeleteBtn" onclick="deleteSelectedExpense()">🗑️ ဖျက်ရန် (Delete)</button>
 
     <script src="app.js"></script>
