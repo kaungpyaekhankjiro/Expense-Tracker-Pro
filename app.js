@@ -1,8 +1,10 @@
-// LocalStorage ထဲကနေ Data အဟောင်းတွေကို ဆွဲထုတ်ခြင်း၊ မရှိရင် Array အလွတ်ဆောက်ခြင်း
 let expenses = JSON.parse(localStorage.getItem('expenses')) || [];
+let selectedExpenseId = null; // ရွေးချယ်ထားသော ID ကို မှတ်ရန်
 
 function saveToStorage() {
     localStorage.setItem('expenses', JSON.stringify(expenses));
+    selectedExpenseId = null; // Reset
+    document.getElementById('floatingDeleteBtn').style.display = 'none';
     renderExpenses();
 }
 
@@ -20,7 +22,6 @@ function addExpense() {
         return;
     }
 
-    // k / K ကို 000 ပြောင်းပေးတဲ့ စနစ်
     if (amountStr.endsWith('k')) {
         amountStr = amountStr.replace('k', '000');
     }
@@ -31,15 +32,8 @@ function addExpense() {
         return;
     }
 
-    // ရက်စွဲရယူခြင်း
-    // မိမိစက်၏ Timezone အမှန်အတိုင်း ရက်စွဲရယူခြင်း
-    let localDate = new Date();
-    let year = localDate.getFullYear();
-    let month = String(localDate.getMonth() + 1).padStart(2, '0');
-    let day = String(localDate.getDate()).padStart(2, '0');
-    let today = `${year}-${month}-${day}`;
+    let today = new Date().toISOString().split('T')[0];
 
-    // Data အသစ်ကို Array ထဲထည့်ခြင်း
     expenses.push({
         id: Date.now(),
         title: title,
@@ -53,9 +47,28 @@ function addExpense() {
     saveToStorage();
 }
 
-function deleteExpense(id) {
-    if (confirm("ဤအသုံးစရိတ်ကို ဖျက်ပစ်ရန် သေချာပါသလား?")) {
-        expenses = expenses.filter(exp => exp.id !== id);
+// ဇယားထဲက တစ်ကြောင်းကို နှိပ်လျှင် Select ဖြစ်စေပြီး Delete ခလုတ် ပြသရန်
+function selectRow(id, rowElement) {
+    // အရင်ရွေးထားတဲ့ စာကြောင်းရှိရင် Highlight ဖြုတ်
+    const allRows = document.querySelectorAll('#expenseList tr');
+    allRows.forEach(r => r.classList.remove('selected-row'));
+
+    // လက်ရှိနှိပ်လိုက်တဲ့ ID က အရင် ID နဲ့ အတူတူပဲဆိုရင် Deselect လုပ်
+    if (selectedExpenseId === id) {
+        selectedExpenseId = null;
+        document.getElementById('floatingDeleteBtn').style.display = 'none';
+    } else {
+        selectedExpenseId = id;
+        rowElement.classList.add('selected-row');
+        document.getElementById('floatingDeleteBtn').style.display = 'block'; // ဖျက်ရန်ခလုတ်ပြမည်
+    }
+}
+
+function deleteSelectedExpense() {
+    if (!selectedExpenseId) return;
+
+    if (confirm("ရွေးချယ်ထားသော ဤအသုံးစရိတ်ကို ဖျက်ပစ်ရန် သေချာပါသလား?")) {
+        expenses = expenses.filter(exp => exp.id !== selectedExpenseId);
         saveToStorage();
     }
 }
@@ -70,20 +83,21 @@ function renderExpenses() {
 
     expenses.forEach((exp, index) => {
         let row = document.createElement('tr');
+        row.style.cursor = 'pointer';
+        // စာကြောင်းကို နှိပ်လျှင် Select လုပ်ခိုင်းသည်
+        row.onclick = function() { selectRow(exp.id, this); };
+        
         row.innerHTML = `
             <td>${index + 1}</td>
             <td>${exp.date}</td>
             <td>${exp.title}</td>
             <td>${exp.amount.toLocaleString()} ${exp.currency}</td>
-            <td><button class="delete-btn" onclick="deleteExpense(${exp.id})">🗑️ ဖျက်မည်</button></td>
         `;
         list.appendChild(row);
 
-        // Total တွက်ချက်ခြင်း
         totals[exp.currency] = (totals[exp.currency] || 0) + exp.amount;
     });
 
-    // Total display ပြသခြင်း
     if (expenses.length === 0) {
         totalArea.innerHTML = `<div class="total-item" style="color: #64748b; text-align:center;">အသုံးစရိတ် မရှိသေးပါ</div>`;
     } else {
@@ -96,5 +110,4 @@ function renderExpenses() {
     }
 }
 
-// App စတက်လာလျှင် ဒေတာများကို တန်းပြရန်
 renderExpenses();
