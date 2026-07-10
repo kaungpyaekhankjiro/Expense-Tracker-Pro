@@ -1,11 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Premium Expense Tracker</title>
-
+    
     <!-- 📱 ဖုန်းပေါ်တွင် Full Screen ဖြစ်စေမည့် Mobile App Tags -->
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -14,7 +13,6 @@
 
     <link rel="stylesheet" href="style.css">
 </head>
-
 <body>
     <div class="header">
         <h2>💰 နေ့စဉ်အသုံးစရိတ် မှတ်တမ်း</h2>
@@ -54,7 +52,6 @@
                         <th>ရက်စွဲ</th>
                         <th>အကြောင်းအရာ</th>
                         <th>ကုန်ကျငွေ</th>
-                        <th>လုပ်ဆောင်ချက်</th>
                     </tr>
                 </thead>
                 <tbody id="expenseList"></tbody>
@@ -68,7 +65,9 @@
         </div>
     </div>
 
+    <!-- 🗑️ ညာဘက်အောက်ထောင့်တွင် သီးသန့်ပေါ်လာမည့် Floating Delete Button -->
+    <button id="floatingDeleteBtn" onclick="deleteSelectedExpense()">🗑️ ဖျက်ရန် (Delete)</button>
+
     <script src="app.js"></script>
 </body>
-
 </html>
