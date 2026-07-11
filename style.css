@@ -5,6 +5,7 @@
     --text: #0f172a;
     --success: #22c55e;
     --danger: #ef4444;
+    --warning: #f59e0b;
 }
 
 body {
@@ -15,14 +16,11 @@ body {
     color: var(--text);
 }
 
-/* ❌ ဒီအကွက်ဟောင်းနေရာမှာ အောက်ကအသစ်ကို အစားထိုးပါ */
 .header {
     background-color: var(--primary);
     color: white;
     text-align: center;
     padding: 15px 0;
-    
-    /* 📱 iOS Full Screen တွင် အပေါ်ဆုံး Status Bar နှင့် စာသားမထပ်စေရန် ဤ ၂ ကြောင်း ထည့်ပါ */
     padding-top: calc(15px + env(safe-area-inset-top));
     padding-bottom: 15px;
 }
@@ -30,7 +28,7 @@ body {
 .container {
     max-width: 650px;
     margin: 20px auto;
-    padding: 0 15px 80px 15px; /* အောက်ခြေတွင် Space ချန်ရန် */
+    padding: 0 15px 90px 15px; /* အောက်ခြေခလုတ်များအတွက် Space ပိုချန်ထားသည် */
     box-sizing: border-box;
 }
 
@@ -85,11 +83,11 @@ button {
 }
 
 #addBtn { background-color: var(--success); }
+#addBtn.edit-mode { background-color: var(--warning); color: white; }
 
-/* ❌ ဒီ table နဲ့ th, td အကွက်ဟောင်းတွေနေရာမှာ အောက်ကကောင်ကို အစားထိုးပါ */
 .table-responsive {
     width: 100%;
-    overflow-x: hidden; /* ဘေးတိုက် ပွတ်ဆွဲစရာမလိုအောင် ပိတ်လိုက်သည် */
+    overflow-x: hidden;
     margin-bottom: 20px;
     border-radius: 8px;
     box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
@@ -97,23 +95,22 @@ button {
 
 table {
     width: 100%;
-    table-layout: fixed; /* ကော်လံအကျယ်တွေကို ပုံသေသတ်မှတ်ရန် ခိုင်းစေခြင်း */
+    table-layout: fixed;
     border-collapse: collapse;
     background: white;
 }
 
-/* 📱 ဖုန်းမျက်နှာပြင်ထဲ ကွက်တိဝင်အောင် တစ်ကော်လံချင်းစီကို အချိုးချလိုက်ခြင်း */
-th:nth-child(1), td:nth-child(1) { width: 12%; } /* အမှတ်စဉ် */
-th:nth-child(2), td:nth-child(2) { width: 28%; } /* ရက်စွဲ */
-th:nth-child(3), td:nth-child(3) { width: 32%; } /* အကြောင်းအရာ */
-th:nth-child(4), td:nth-child(4) { width: 28%; } /* ကုန်ကျငွေ */
+th:nth-child(1), td:nth-child(1) { width: 12%; }
+th:nth-child(2), td:nth-child(2) { width: 28%; }
+th:nth-child(3), td:nth-child(3) { width: 32%; }
+th:nth-child(4), td:nth-child(4) { width: 28%; }
 
 th, td {
-    padding: 12px 6px; /* ဘေး space ကို နည်းနည်းလျှော့လိုက်သည် */
+    padding: 12px 6px;
     text-align: left;
     border-bottom: 1px solid #e2e8f0;
-    font-size: 13px; /* လူကြီးတွေ မြင်ရလွယ်ပြီး ဖုန်းထဲဆံ့မယ့် အနေတော် Size */
-    word-break: break-word; /* စာသားရှည်ရင် အောက်လိုင်း ဆင်းပေးရန် */
+    font-size: 13px;
+    word-break: break-word;
 }
 
 th { 
@@ -122,16 +119,9 @@ th {
     text-align: center;
 }
 
-td:nth-child(4) { 
-    text-align: right; 
-    font-weight: bold; 
-}
+td:nth-child(4) { text-align: right; font-weight: bold; }
+td:nth-child(1), td:nth-child(2) { text-align: center; }
 
-td:nth-child(1), td:nth-child(2) { 
-    text-align: center; 
-}
-
-/* 🖱️ ရွေးချယ်ထားသော စာကြောင်းအား ကွဲပြားစွာ ပြသရန် */
 tr.selected-row {
     background-color: #dbeafe !important;
     color: #1d4ed8;
@@ -150,18 +140,35 @@ tr.selected-row {
     margin: 5px 0;
 }
 
-/* 🗑️ ညာဘက်အောက်ခြေ Floating Button စတိုင် */
-#floatingDeleteBtn {
+/* 📱 ညာဘက်အောက်ခြေ Floating Button Container စတိုင် */
+#actionButtonGroup {
     display: none; /* အစပိုင်းတွင် ဖျောက်ထားမည် */
     position: fixed;
     bottom: 20px;
     right: 20px;
+    display: flex;
+    gap: 10px;
+    z-index: 999;
+}
+
+#floatingDeleteBtn {
     width: auto;
     background-color: var(--danger);
     color: white;
-    padding: 12px 20px;
+    padding: 12px 18px;
     font-size: 14px;
     border-radius: 50px;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-    z-index: 999;
+    margin: 0;
+}
+
+#floatingEditBtn {
+    width: auto;
+    background-color: var(--warning);
+    color: white;
+    padding: 12px 18px;
+    font-size: 14px;
+    border-radius: 50px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    margin: 0;
 }
