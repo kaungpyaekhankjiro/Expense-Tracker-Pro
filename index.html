@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Premium Expense Tracker</title>
     
-    <!-- 📱 ဖုန်းပေါ်တွင် Full Screen ဖြစ်စေမည့် Mobile App Tags -->
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="mobile-web-app-capable" content="yes">
@@ -27,7 +26,6 @@
                 <input type="text" id="titleInput" placeholder="ဥပမာ - စျေးဝယ်ခြင်း">
             </div>
             
-            <!-- 📅 ရက်စွဲရွေးချယ်ရန် အကွက်အသစ် (ဤအကွက်မရှိလျှင် Add ခလုတ် နှိပ်မရပါ) -->
             <div class="input-group">
                 <label>ရက်စွဲရွေးချယ်ရန်:</label>
                 <input type="date" id="dateInput">
@@ -48,6 +46,31 @@
                 </div>
             </div>
             <button id="addBtn" onclick="addExpense()">➕ အသစ်ထည့်မည် (Add)</button>
+        </div>
+
+        <!-- 🔎 ဤအကွက်သည် အသစ်တိုးလာသော History Filter (လချုပ်/ရက်ချုပ်) စနစ် ဖြစ်သည် -->
+        <div class="form-card" style="background: #eff6ff; border: 1px solid #bfdbfe;">
+            <h3>📊 စာရင်းများ ပြန်လည်ကြည့်ရှုရန် (History)</h3>
+            <div class="amount-row">
+                <div style="flex: 1;">
+                    <label style="font-weight:bold; font-size:14px;">ကြည့်ရှုမည့် ပုံစံ:</label>
+                    <select id="filterType" onchange="toggleFilterInputs()">
+                        <option value="all">စာရင်းအားလုံးကြည့်မည်</option>
+                        <option value="date">ရက်စွဲအလိုက်ကြည့်မည်</option>
+                        <option value="month">လအလိုက် (လချုပ်) ကြည့်မည်</option>
+                    </select>
+                </div>
+                
+                <div id="filterDateArea" style="flex: 1; display: none;">
+                    <label style="font-weight:bold; font-size:14px;">ရက်စွဲရွေးရန်:</label>
+                    <input type="date" id="filterDate" onchange="renderExpenses()">
+                </div>
+
+                <div id="filterMonthArea" style="flex: 1; display: none;">
+                    <label style="font-weight:bold; font-size:14px;">လရွေးရန်:</label>
+                    <input type="month" id="filterMonth" onchange="renderExpenses()">
+                </div>
+            </div>
         </div>
 
         <!-- Table View -->
@@ -72,7 +95,7 @@
         </div>
     </div>
 
-    <!-- 🗑️ Floating Delete Button -->
+    <!-- Floating Delete Button -->
     <button id="floatingDeleteBtn" onclick="deleteSelectedExpense()">🗑️ ဖျက်ရန် (Delete)</button>
 
     <script src="app.js"></script>
