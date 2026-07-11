@@ -1,6 +1,153 @@
 let expenses = JSON.parse(localStorage.getItem('expenses')) || [];
 let selectedExpenseId = null;
 let isEditMode = false;
+let currentLang = localStorage.getItem('appLang') || 'mm'; // ရွေးထားသော ဘာသာစကားကို သိမ်းထားရန်
+
+// 🌐 ဘာသာစကား ၃ မျိုးအတွက် စာသားများ သတ်မှတ်ချက် Dictionary
+const translations = {
+    mm: {
+        appTitle: "💰 နေ့စဉ်အသုံးစရိတ် မှတ်တမ်း",
+        formTitle: "အချက်အလက်အသစ်ထည့်ရန်",
+        editFormTitle: "📝 အချက်အလက် ပြင်ဆင်ရန်",
+        labelTitle: "အသုံးပြုသည့် အကြောင်းအရာ:",
+        placeholderTitle: "ဥပမာ - စျေးဝယ်ခြင်း",
+        labelDate: "ရက်စွဲရွေးချယ်ရန်:",
+        labelAmount: "ကုန်ကျငွေ ပမာဏ:",
+        placeholderAmount: "ဥပမာ - 100k သို့မဟုတ် 50000",
+        addBtn: "➕ အသစ်ထည့်မည် (Add)",
+        updateBtn: "💾 ပြင်ဆင်ချက်များသိမ်းမည် (Update)",
+        filterTitle: "📊 စာရင်းများ ပြန်လည်ကြည့်ရှုရန် (History)",
+        labelFilterMode: "ကြည့်ရှုမည့် ပုံစံ:",
+        optAll: "စာရင်းအားလုံးကြည့်မည်",
+        optDate: "ရက်စွဲအလိုက်ကြည့်မည်",
+        optMonth: "လအလိုက် (လချုပ်) ကြည့်မည်",
+        labelFilterDate: "ရက်စွဲရွေးရန်:",
+        labelFilterMonth: "လရွေးရန်:",
+        thIndex: "အမှတ်စဉ်",
+        thDate: "ရက်စွဲ",
+        thTitle: "အကြောင်းအရာ",
+        thAmount: "ကုန်ကျငွေ",
+        totalHeader: "📊 စုစုပေါင်းကုန်ကျငွေစာရင်းများ -",
+        floatingEditBtn: "✏️ ပြင်ဆင်ရန် (Edit)",
+        floatingDeleteBtn: "🗑️ ဖျက်ရန် (Delete)",
+        noData: "ပြသစရာ စာရင်းမရှိသေးပါ",
+        noTotal: "အသုံးစရိတ် မရှိသေးပါ",
+        totalSuffix: "စုစုပေါင်း",
+        alertEmpty: "အချက်အလက် အကုန်ဖြည့်ပါဦးဗျာ။",
+        alertInvalidAmount: "⚠️ ကုန်ကျငွေနေရာတွင် ဂဏန်းများ သို့မဟုတ် အဆုံး၌ 'k' တစ်လုံးတည်းသာ ရိုက်ထည့်ခွင့်ရှိပါတယ်ဗျာ။",
+        alertNan: "ပမာဏနေရာမှာ ဂဏန်းပဲ ရိုက်ပါဗျာ။",
+        confirmDelete: "ရွေးချယ်ထားသော ဤအသုံးစရိတ်ကို ဖျက်ပစ်ရန် သေချာပါသလား?"
+    },
+    en: {
+        appTitle: "💰 Daily Expense Tracker",
+        formTitle: "Add New Record",
+        editFormTitle: "📝 Edit Record",
+        labelTitle: "Expense Description:",
+        placeholderTitle: "e.g., Shopping, Cafe",
+        labelDate: "Select Date:",
+        labelAmount: "Amount Spent:",
+        placeholderAmount: "e.g., 100k or 50000",
+        addBtn: "➕ Add Expense",
+        updateBtn: "💾 Update Changes",
+        filterTitle: "📊 View History",
+        labelFilterMode: "Filter Mode:",
+        optAll: "Show All Records",
+        optDate: "Filter by Date",
+        optMonth: "Filter by Month",
+        labelFilterDate: "Select Date:",
+        labelFilterMonth: "Select Month:",
+        thIndex: "No.",
+        thDate: "Date",
+        thTitle: "Description",
+        thAmount: "Amount",
+        totalHeader: "📊 Total Expense Summary -",
+        floatingEditBtn: "✏️ Edit",
+        floatingDeleteBtn: "🗑️ Delete",
+        noData: "No records found",
+        noTotal: "No expenses recorded yet",
+        totalSuffix: "Total",
+        alertEmpty: "Please fill in all information.",
+        alertInvalidAmount: "⚠️ Please enter numbers only or a single 'k' at the end.",
+        alertNan: "Please enter a valid numeric value.",
+        confirmDelete: "Are you sure you want to delete this expense?"
+    },
+    th: {
+        appTitle: "💰 บันทึกรายจ่ายประจำวัน",
+        formTitle: "เพิ่มรายการใหม่",
+        editFormTitle: "📝 แก้ไขรายการ",
+        labelTitle: "รายละเอียดค่าใช้จ่าย:",
+        placeholderTitle: "เช่น ช้อปปิ้ง, ซื้อของ",
+        labelDate: "เลือกวันที่:",
+        labelAmount: "จำนวนเงิน:",
+        placeholderAmount: "เช่น 100k หรือ 50000",
+        addBtn: "➕ เพิ่มรายการ",
+        updateBtn: "💾 บันทึกการแก้ไข",
+        filterTitle: "📊 ดูประวัติย้อนหลัง",
+        labelFilterMode: "รูปแบบการดู:",
+        optAll: "ดูรายการทั้งหมด",
+        optDate: "ดูตามวันที่",
+        optMonth: "ดูตามรายเดือน",
+        labelFilterDate: "เลือกวันที่:",
+        labelFilterMonth: "เลือกเดือน:",
+        thIndex: "ลำดับ",
+        thDate: "วันที่",
+        thTitle: "รายการ",
+        thAmount: "จำนวนเงิน",
+        totalHeader: "📊 สรุปยอดรวมค่าใช้จ่าย -",
+        floatingEditBtn: "✏️ แก้ไข",
+        floatingDeleteBtn: "🗑️ ลบรายการ",
+        noData: "ไม่มีข้อมูลแสดง",
+        noTotal: "ยังไม่มีบันทึกค่าใช้จ่าย",
+        totalSuffix: "รวมทั้งหมด",
+        alertEmpty: "กรุณากรอกข้อมูลให้ครบถ้วน",
+        alertInvalidAmount: "⚠️ กรุณาใส่เฉพาะตัวเลขหรือตัวอักษร 'k' ตัวเดียวที่ท้ายเท่านั้น",
+        alertNan: "กรุณาใส่ตัวเลขที่ถูกต้อง",
+        confirmDelete: "คุณแน่ใจหรือไม่ที่จะลบรายการนี้?"
+    }
+};
+
+// 🌐 ဘာသာစကား စာသားများကို UI ပေါ်တွင် ပြောင်းလဲပေးသည့်စနစ်
+function updateLanguageUI() {
+    const lang = currentLang;
+    const t = translations[lang];
+
+    document.getElementById('appTitle').innerHTML = t.appTitle;
+    document.getElementById('formTitle').innerText = isEditMode ? t.editFormTitle : t.formTitle;
+    document.getElementById('labelTitle').innerText = t.labelTitle;
+    document.getElementById('titleInput').placeholder = t.placeholderTitle;
+    document.getElementById('labelDate').innerText = t.labelDate;
+    document.getElementById('labelAmount').innerText = t.labelAmount;
+    document.getElementById('amountInput').placeholder = t.placeholderAmount;
+    
+    const addBtn = document.getElementById('addBtn');
+    addBtn.innerText = isEditMode ? t.updateBtn : t.addBtn;
+
+    document.getElementById('filterTitle').innerText = t.filterTitle;
+    document.getElementById('labelFilterMode').innerText = t.labelFilterMode;
+    document.getElementById('optAll').innerText = t.optAll;
+    document.getElementById('optDate').innerText = t.optDate;
+    document.getElementById('optMonth').innerText = t.optMonth;
+    document.getElementById('labelFilterDate').innerText = t.labelFilterDate;
+    document.getElementById('labelFilterMonth').innerText = t.labelFilterMonth;
+
+    document.getElementById('thIndex').innerText = t.thIndex;
+    document.getElementById('thDate').innerText = t.thDate;
+    document.getElementById('thTitle').innerText = t.thTitle;
+    document.getElementById('thAmount').innerText = t.thAmount;
+    document.getElementById('totalHeader').innerText = t.totalHeader;
+
+    document.getElementById('floatingEditBtn').innerText = t.floatingEditBtn;
+    document.getElementById('floatingDeleteBtn').innerText = t.floatingDeleteBtn;
+    
+    document.getElementById('langSelect').value = lang;
+}
+
+function changeLanguage() {
+    currentLang = document.getElementById('langSelect').value;
+    localStorage.setItem('appLang', currentLang); // ရွေးချယ်မှုကို သိမ်းထားရန်
+    updateLanguageUI();
+    renderExpenses(); // ဇယားထဲမှ စာသားအချို့ပါ လိုက်ပြောင်းရန် ပြန်ဆွဲခြင်း
+}
 
 function saveToStorage() {
     localStorage.setItem('expenses', JSON.stringify(expenses));
@@ -14,13 +161,9 @@ function resetActionState() {
     isEditMode = false;
     document.getElementById('actionButtonGroup').style.display = 'none';
     
-    document.getElementById('formTitle').innerText = "အချက်အလက်အသစ်ထည့်ရန်";
-    const addBtn = document.getElementById('addBtn');
-    addBtn.innerText = "➕ အသစ်ထည့်မည် (Add)";
-    addBtn.classList.remove('edit-mode');
-    
     document.getElementById('titleInput').value = "";
     document.getElementById('amountInput').value = "";
+    updateLanguageUI();
 }
 
 function setDefaultDate() {
@@ -58,6 +201,7 @@ function toggleFilterInputs() {
 }
 
 function addExpense() {
+    const t = translations[currentLang];
     const titleInput = document.getElementById('titleInput');
     const amountInput = document.getElementById('amountInput');
     const currencyInput = document.getElementById('currencyInput');
@@ -69,13 +213,13 @@ function addExpense() {
     let selectedDate = dateInput.value;
 
     if (title === "" || amountStr === "" || selectedDate === "") {
-        alert("အချက်အလက် အကုန်ဖြည့်ပါဦးဗျာ။");
+        alert(t.alertEmpty);
         return;
     }
 
     const validPattern = /^[0-9]+(\.[0-9]+)?k?$/;
     if (!validPattern.test(amountStr)) {
-        alert("⚠️ ကုန်ကျငွေနေရာတွင် ဂဏန်းများ သို့မဟုတ် အဆုံး၌ 'k' တစ်လုံးတည်းသာ ရိုက်ထည့်ခွင့်ရှိပါတယ်ဗျာ။");
+        alert(t.alertInvalidAmount);
         return;
     }
 
@@ -85,7 +229,7 @@ function addExpense() {
 
     let amount = parseFloat(amountStr);
     if (isNaN(amount)) {
-        alert("ပမာဏနေရာမှာ ဂဏန်းပဲ ရိုက်ပါဗျာ။");
+        alert(t.alertNan);
         return;
     }
 
@@ -140,25 +284,23 @@ function editSelectedExpense() {
     document.getElementById('currencyInput').value = target.currency;
     document.getElementById('dateInput').value = target.date;
 
-    document.getElementById('formTitle').innerText = "📝 အချက်အလက် ပြင်ဆင်ရန်";
-    const addBtn = document.getElementById('addBtn');
-    addBtn.innerText = "💾 ပြင်ဆင်ချက်များသိမ်းမည် (Update)";
-    addBtn.classList.add('edit-mode');
-
+    updateLanguageUI();
     document.getElementById('actionButtonGroup').style.display = 'none';
     window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
 function deleteSelectedExpense() {
+    const t = translations[currentLang];
     if (!selectedExpenseId) return;
 
-    if (confirm("ရွေးချယ်ထားသော ဤအသုံးစရိတ်ကို ဖျက်ပစ်ရန် သေချာပါသလား?")) {
+    if (confirm(t.confirmDelete)) {
         expenses = expenses.filter(exp => exp.id !== selectedExpenseId);
         saveToStorage();
     }
 }
 
 function renderExpenses() {
+    const t = translations[currentLang];
     const list = document.getElementById('expenseList');
     const totalArea = document.getElementById('totalArea');
     list.innerHTML = "";
@@ -172,7 +314,6 @@ function renderExpenses() {
     let dailyTotals = {}; 
     let displayExpenses = [];
 
-    // ၁။ ဒေတာများကို စစ်ထုတ်ပြီး တစ်ရက်ချင်းစီ၏ ကုန်ကျငွေစုစုပေါင်းကို တွက်ချက်ခြင်း
     expenses.forEach((exp) => {
         if (filterType === 'date' && exp.date !== filterDate) return;
         if (filterType === 'month' && exp.date.substring(0, 7) !== filterMonth) return;
@@ -184,7 +325,6 @@ function renderExpenses() {
         }
     });
 
-    // ၂။ တစ်လအတွင်း ရက်စွဲအမျိုးမျိုးရှိပါက အများဆုံးနေ့နှင့် အနည်းဆုံးနေ့ကို ရှာဖွေခြင်း
     let maxDay = null, minDay = null;
     let maxAmount = -1, minAmount = Infinity;
     const uniqueDaysCount = Object.keys(dailyTotals).length;
@@ -202,14 +342,12 @@ function renderExpenses() {
         }
     }
 
-    // ၃။ ဇယားဆွဲထုတ်ခြင်း
     let displayIndex = 1;
     displayExpenses.forEach((exp) => {
         let row = document.createElement('tr');
         row.style.cursor = 'pointer';
         row.onclick = function() { selectRow(exp.id, this); };
         
-        // 📅 ရက်စွဲကွက်လပ်အတွက်သာ အနည်း/အများ အရောင်ခွဲခြားသတ်မှတ်ခြင်း
         let dateHighlightClass = '';
         if (uniqueDaysCount > 1) {
             if (exp.date === maxDay) dateHighlightClass = 'max-day-date';
@@ -228,10 +366,9 @@ function renderExpenses() {
     });
 
     if (displayIndex === 1) {
-        list.innerHTML = `<tr><td colspan="4" style="text-align:center; color:#64748b; padding:20px;">ပြသစရာ စာရင်းမရှိသေးပါ</td></tr>`;
-        totalArea.innerHTML = `<div class="total-item" style="color: #64748b; text-align:center;">အသုံးစရိတ် မရှိသေးပါ</div>`;
+        list.innerHTML = `<tr><td colspan="4" style="text-align:center; color:#64748b; padding:20px;">${t.noData}</td></tr>`;
+        totalArea.innerHTML = `<div class="total-item" style="color: #64748b; text-align:center;">${t.noTotal}</div>`;
     } else {
-        // 📊 စုစုပေါင်းပြကွက်တွင် 500k ကျော်/မကျော်အလိုက် အနီ/အစိမ်း အရောင်ခွဲခြားခြင်း
         for (let curr in totals) {
             let div = document.createElement('div');
             div.className = "total-item";
@@ -241,7 +378,8 @@ function renderExpenses() {
                 colorClass = (totals[curr] > 500000) ? 'total-danger' : 'total-success';
             }
             
-            div.innerHTML = `<span class="${colorClass}">🔹 ${curr} စုစုပေါင်း = ${totals[curr].toLocaleString()} ${curr}</span>`;
+            // ဘာသာစကားအလိုက် စုစုပေါင်း စာတန်းပြောင်းလဲခြင်း
+            div.innerHTML = `<span class="${colorClass}">🔹 ${curr} ${t.totalSuffix} = ${totals[curr].toLocaleString()} ${curr}</span>`;
             totalArea.appendChild(div);
         }
     }
@@ -257,4 +395,5 @@ document.addEventListener('click', function(e) {
 });
 
 setDefaultDate();
+updateLanguageUI(); // စတင်ချိန်တွင် ဘာသာစကား UI အား တွဲဖက်ဆွဲပေးခြင်း
 renderExpenses();
