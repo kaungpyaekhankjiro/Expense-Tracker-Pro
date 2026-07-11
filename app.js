@@ -172,7 +172,7 @@ function renderExpenses() {
     let dailyTotals = {}; 
     let displayExpenses = [];
 
-    // ၁။ သက်ဆိုင်ရာ စာရင်းများကို Filter စစ်ထုတ်ပြီး တစ်ရက်ချင်းစီအတွက် စုစုပေါင်း Ks ကို ပေါင်းခြင်း
+    // ၁။ ဒေတာများကို စစ်ထုတ်ပြီး တစ်ရက်ချင်းစီ၏ ကုန်ကျငွေစုစုပေါင်းကို တွက်ချက်ခြင်း
     expenses.forEach((exp) => {
         if (filterType === 'date' && exp.date !== filterDate) return;
         if (filterType === 'month' && exp.date.substring(0, 7) !== filterMonth) return;
@@ -184,7 +184,7 @@ function renderExpenses() {
         }
     });
 
-    // ၂။ တစ်ရက်ထက်ပိုရှိမှသာ အများဆုံးနေ့နှင့် အနည်းဆုံးနေ့ကို ကွဲပြားစွာ ရှာဖွေမည်
+    // ၂။ တစ်လအတွင်း ရက်စွဲအမျိုးမျိုးရှိပါက အများဆုံးနေ့နှင့် အနည်းဆုံးနေ့ကို ရှာဖွေခြင်း
     let maxDay = null, minDay = null;
     let maxAmount = -1, minAmount = Infinity;
     const uniqueDaysCount = Object.keys(dailyTotals).length;
@@ -209,22 +209,18 @@ function renderExpenses() {
         row.style.cursor = 'pointer';
         row.onclick = function() { selectRow(exp.id, this); };
         
-        // 🚨 ယနေ့ရက်စွဲ၏ စုစုပေါင်းကုန်ကျငွေသည် ၅ သိန်းကျော်ပါက တန်းပြီး အနီရောင်ပြောင်းရန် ခိုင်းစေခြင်း
-        let isOverLimit = (exp.currency === 'Ks' && dailyTotals[exp.date] > 500000);
-        let limitClass = isOverLimit ? 'limit-exceeded' : '';
-        
-        // 🔴🟢 နေ့ရက်စွဲ မတူညီသော စာရင်းများရှိမှသာ Highlight ချယ်မည်
-        let highlightClass = '';
+        // 📅 ရက်စွဲကွက်လပ်အတွက်သာ အနည်း/အများ အရောင်ခွဲခြားသတ်မှတ်ခြင်း
+        let dateHighlightClass = '';
         if (uniqueDaysCount > 1) {
-            if (exp.date === maxDay) highlightClass = 'max-day-highlight';
-            else if (exp.date === minDay) highlightClass = 'min-day-highlight';
+            if (exp.date === maxDay) dateHighlightClass = 'max-day-date';
+            else if (exp.date === minDay) dateHighlightClass = 'min-day-date';
         }
 
         row.innerHTML = `
-            <td class="${highlightClass}">${displayIndex++}</td>
-            <td class="${limitClass} ${highlightClass}">${exp.date}</td>
-            <td class="${limitClass}">${exp.title}</td>
-            <td class="${limitClass}">${exp.amount.toLocaleString()} ${exp.currency}</td>
+            <td>${displayIndex++}</td>
+            <td class="${dateHighlightClass}">${exp.date}</td>
+            <td>${exp.title}</td>
+            <td>${exp.amount.toLocaleString()} ${exp.currency}</td>
         `;
         list.appendChild(row);
 
@@ -235,10 +231,17 @@ function renderExpenses() {
         list.innerHTML = `<tr><td colspan="4" style="text-align:center; color:#64748b; padding:20px;">ပြသစရာ စာရင်းမရှိသေးပါ</td></tr>`;
         totalArea.innerHTML = `<div class="total-item" style="color: #64748b; text-align:center;">အသုံးစရိတ် မရှိသေးပါ</div>`;
     } else {
+        // 📊 စုစုပေါင်းပြကွက်တွင် 500k ကျော်/မကျော်အလိုက် အနီ/အစိမ်း အရောင်ခွဲခြားခြင်း
         for (let curr in totals) {
             let div = document.createElement('div');
             div.className = "total-item";
-            div.innerHTML = `🔹 ${curr} စုစုပေါင်း = ${totals[curr].toLocaleString()} ${curr}`;
+            
+            let colorClass = '';
+            if (curr === 'Ks') {
+                colorClass = (totals[curr] > 500000) ? 'total-danger' : 'total-success';
+            }
+            
+            div.innerHTML = `<span class="${colorClass}">🔹 ${curr} စုစုပေါင်း = ${totals[curr].toLocaleString()} ${curr}</span>`;
             totalArea.appendChild(div);
         }
     }
