@@ -13,14 +13,15 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <!-- 🌐 Header ထဲတွင် Language Selector ထည့်သွင်းထားသည် -->
+    <!-- 🌐 Header အတွင်း ညာဘက်၌ ကမ္ဘာလုံးပုံစံ ဘာသာစကား Selector ထားရှိခြင်း -->
     <div class="header">
         <h2 id="appTitle">💰 နေ့စဉ်အသုံးစရိတ် မှတ်တမ်း</h2>
-        <div class="lang-selector-container">
+        <div class="lang-wrapper">
+            <span>🌐</span>
             <select id="langSelect" onchange="changeLanguage()">
-                <option value="mm">🇲🇲 MM</option>
-                <option value="en">🇺🇸 EN</option>
-                <option value="th">🇹🇭 TH</option>
+                <option value="mm">MM</option>
+                <option value="en">EN</option>
+                <option value="th">TH</option>
             </select>
         </div>
     </div>
