@@ -401,3 +401,55 @@ window.addEventListener('DOMContentLoaded', () => {
     updateLanguageUI();
     renderExpenses();
 });
+// ==========================================
+// 🔄 PWA AUTO-UPDATE SYSTEM ("Update This" Feature)
+// ==========================================
+
+// ဆရာကြီး ကုဒ်အသစ်တင်တိုင်း ဤနံပါတ်ကို ၁ တိုးပေးပါ (ဥပမာ - 1.0.1, 1.0.2)
+const APP_VERSION = "1.0.1"; 
+
+function checkAppUpdate() {
+    const savedVersion = localStorage.getItem('appVersion');
+    
+    // ဗားရှင်းအသစ် ဖြစ်နေပါက Update ခလုတ်တွဲ ပေါ်လာစေရန် ခိုင်းခြင်း
+    if (savedVersion && savedVersion !== APP_VERSION) {
+        showUpdateNotification();
+    }
+    
+    // လက်ရှိဗားရှင်းကို မှတ်သားထားခြင်း
+    localStorage.setItem('appVersion', APP_VERSION);
+}
+
+function showUpdateNotification() {
+    // မျက်နှာပြင် အပေါ်ဆုံးတွင် Update Banner လေး တစ်ခါတည်း ဆောက်ပြီး ပြသခြင်း
+    const updateBanner = document.createElement('div');
+    updateBanner.id = "updateBanner";
+    
+    // ဘာသာစကားအလိုက် စာသားပြောင်းလဲခြင်း
+    const msg = currentLang === 'en' ? "🔄 New update available!" : currentLang === 'th' ? "🔄 มีเวอร์ชันใหม่พร้อมใช้งาน!" : "🔄 ဗားရှင်းအသစ် ရရှိနိုင်ပါပြီ!";
+    const btnText = currentLang === 'en' ? "Update This" : currentLang === 'th' ? "อัปเดตตอนนี้" : "ယခုဗားရှင်းမြှင့်မည် (Update This)";
+
+    updateBanner.innerHTML = `
+        <div style="position: fixed; top: 0; left: 0; width: 100%; background: #f59e0b; color: white; text-align: center; padding: 12px; font-weight: bold; font-size: 14px; z-index: 10000; box-shadow: 0 2px 10px rgba(0,0,0,0.2); display: flex; justify-content: center; align-items: center; gap: 15px;">
+            <span>${msg}</span>
+            <button onclick="applyAppUpdate()" style="width: auto; margin: 0; padding: 6px 15px; font-size: 12px; background: white; color: #b45309; border-radius: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); font-weight: bold;">${btnText}</button>
+        </div>
+    `;
+    document.body.appendChild(updateBanner);
+}
+
+function applyAppUpdate() {
+    // Cache များကို ရာနှုန်းပြည့် ရှင်းလင်းပြီး App အား Hard Reload လုပ်ပစ်ခြင်း
+    if ('caches' in window) {
+        caches.keys().then(names => {
+            for (let name of names) caches.delete(name);
+        });
+    }
+    // Website အား အသစ်ပြန်ဖွင့်ခြင်း
+    window.location.reload(true);
+}
+
+// Dom Loaded တွင် Update ရှိမရှိ စစ်ဆေးခိုင်းခြင်း
+window.addEventListener('DOMContentLoaded', () => {
+    checkAppUpdate();
+});
