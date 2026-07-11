@@ -1,9 +1,8 @@
 let expenses = JSON.parse(localStorage.getItem('expenses')) || [];
 let selectedExpenseId = null;
 let isEditMode = false;
-let currentLang = localStorage.getItem('appLang') || 'mm'; // ရွေးထားသော ဘာသာစကားကို သိမ်းထားရန်
+let currentLang = localStorage.getItem('appLang') || 'mm';
 
-// 🌐 ဘာသာစကား ၃ မျိုးအတွက် စာသားများ သတ်မှတ်ချက် Dictionary
 const translations = {
     mm: {
         appTitle: "💰 နေ့စဉ်အသုံးစရိတ် မှတ်တမ်း",
@@ -106,47 +105,47 @@ const translations = {
     }
 };
 
-// 🌐 ဘာသာစကား စာသားများကို UI ပေါ်တွင် ပြောင်းလဲပေးသည့်စနစ်
 function updateLanguageUI() {
     const lang = currentLang;
     const t = translations[lang];
 
-    document.getElementById('appTitle').innerHTML = t.appTitle;
-    document.getElementById('formTitle').innerText = isEditMode ? t.editFormTitle : t.formTitle;
-    document.getElementById('labelTitle').innerText = t.labelTitle;
-    document.getElementById('titleInput').placeholder = t.placeholderTitle;
-    document.getElementById('labelDate').innerText = t.labelDate;
-    document.getElementById('labelAmount').innerText = t.labelAmount;
-    document.getElementById('amountInput').placeholder = t.placeholderAmount;
+    // Cache ကြောင့် ID တစ်ခုခု ချို့ယွင်းနေပါက ကုဒ်ရပ်မသွားစေရန် အကာအကွယ်ပေးထားခြင်း
+    if(document.getElementById('appTitle')) document.getElementById('appTitle').innerHTML = t.appTitle;
+    if(document.getElementById('formTitle')) document.getElementById('formTitle').innerText = isEditMode ? t.editFormTitle : t.formTitle;
+    if(document.getElementById('labelTitle')) document.getElementById('labelTitle').innerText = t.labelTitle;
+    if(document.getElementById('titleInput')) document.getElementById('titleInput').placeholder = t.placeholderTitle;
+    if(document.getElementById('labelDate')) document.getElementById('labelDate').innerText = t.labelDate;
+    if(document.getElementById('labelAmount')) document.getElementById('labelAmount').innerText = t.labelAmount;
+    if(document.getElementById('amountInput')) document.getElementById('amountInput').placeholder = t.placeholderAmount;
     
     const addBtn = document.getElementById('addBtn');
-    addBtn.innerText = isEditMode ? t.updateBtn : t.addBtn;
+    if(addBtn) addBtn.innerText = isEditMode ? t.updateBtn : t.addBtn;
 
-    document.getElementById('filterTitle').innerText = t.filterTitle;
-    document.getElementById('labelFilterMode').innerText = t.labelFilterMode;
-    document.getElementById('optAll').innerText = t.optAll;
-    document.getElementById('optDate').innerText = t.optDate;
-    document.getElementById('optMonth').innerText = t.optMonth;
-    document.getElementById('labelFilterDate').innerText = t.labelFilterDate;
-    document.getElementById('labelFilterMonth').innerText = t.labelFilterMonth;
+    if(document.getElementById('filterTitle')) document.getElementById('filterTitle').innerText = t.filterTitle;
+    if(document.getElementById('labelFilterMode')) document.getElementById('labelFilterMode').innerText = t.labelFilterMode;
+    if(document.getElementById('optAll')) document.getElementById('optAll').innerText = t.optAll;
+    if(document.getElementById('optDate')) document.getElementById('optDate').innerText = t.optDate;
+    if(document.getElementById('optMonth')) document.getElementById('optMonth').innerText = t.optMonth;
+    if(document.getElementById('labelFilterDate')) document.getElementById('labelFilterDate').innerText = t.labelFilterDate;
+    if(document.getElementById('labelFilterMonth')) document.getElementById('labelFilterMonth').innerText = t.labelFilterMonth;
 
-    document.getElementById('thIndex').innerText = t.thIndex;
-    document.getElementById('thDate').innerText = t.thDate;
-    document.getElementById('thTitle').innerText = t.thTitle;
-    document.getElementById('thAmount').innerText = t.thAmount;
-    document.getElementById('totalHeader').innerText = t.totalHeader;
+    if(document.getElementById('thIndex')) document.getElementById('thIndex').innerText = t.thIndex;
+    if(document.getElementById('thDate')) document.getElementById('thDate').innerText = t.thDate;
+    if(document.getElementById('thTitle')) document.getElementById('thTitle').innerText = t.thTitle;
+    if(document.getElementById('thAmount')) document.getElementById('thAmount').innerText = t.thAmount;
+    if(document.getElementById('totalHeader')) document.getElementById('totalHeader').innerText = t.totalHeader;
 
-    document.getElementById('floatingEditBtn').innerText = t.floatingEditBtn;
-    document.getElementById('floatingDeleteBtn').innerText = t.floatingDeleteBtn;
+    if(document.getElementById('floatingEditBtn')) document.getElementById('floatingEditBtn').innerText = t.floatingEditBtn;
+    if(document.getElementById('floatingDeleteBtn')) document.getElementById('floatingDeleteBtn').innerText = t.floatingDeleteBtn;
     
-    document.getElementById('langSelect').value = lang;
+    if(document.getElementById('langSelect')) document.getElementById('langSelect').value = lang;
 }
 
 function changeLanguage() {
     currentLang = document.getElementById('langSelect').value;
-    localStorage.setItem('appLang', currentLang); // ရွေးချယ်မှုကို သိမ်းထားရန်
+    localStorage.setItem('appLang', currentLang);
     updateLanguageUI();
-    renderExpenses(); // ဇယားထဲမှ စာသားအချို့ပါ လိုက်ပြောင်းရန် ပြန်ဆွဲခြင်း
+    renderExpenses();
 }
 
 function saveToStorage() {
@@ -159,15 +158,16 @@ function saveToStorage() {
 function resetActionState() {
     selectedExpenseId = null;
     isEditMode = false;
-    document.getElementById('actionButtonGroup').style.display = 'none';
+    if(document.getElementById('actionButtonGroup')) document.getElementById('actionButtonGroup').style.display = 'none';
     
-    document.getElementById('titleInput').value = "";
-    document.getElementById('amountInput').value = "";
+    if(document.getElementById('titleInput')) document.getElementById('titleInput').value = "";
+    if(document.getElementById('amountInput')) document.getElementById('amountInput').value = "";
     updateLanguageUI();
 }
 
 function setDefaultDate() {
     const dateInput = document.getElementById('dateInput');
+    if(!dateInput) return;
     const now = new Date();
     const year = now.getFullYear();
     const month = String(now.getMonth() + 1).padStart(2, '0');
@@ -263,11 +263,11 @@ function selectRow(id, rowElement) {
 
     if (selectedExpenseId === id) {
         selectedExpenseId = null;
-        btnGroup.style.display = 'none';
+        if(btnGroup) btnGroup.style.display = 'none';
     } else {
         selectedExpenseId = id;
         rowElement.classList.add('selected-row');
-        btnGroup.style.display = 'flex';
+        if(btnGroup) btnGroup.style.display = 'flex';
     }
 }
 
@@ -285,7 +285,7 @@ function editSelectedExpense() {
     document.getElementById('dateInput').value = target.date;
 
     updateLanguageUI();
-    document.getElementById('actionButtonGroup').style.display = 'none';
+    if(document.getElementById('actionButtonGroup')) document.getElementById('actionButtonGroup').style.display = 'none';
     window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
@@ -303,6 +303,8 @@ function renderExpenses() {
     const t = translations[currentLang];
     const list = document.getElementById('expenseList');
     const totalArea = document.getElementById('totalArea');
+    if(!list || !totalArea) return;
+    
     list.innerHTML = "";
     totalArea.innerHTML = "";
 
@@ -378,7 +380,6 @@ function renderExpenses() {
                 colorClass = (totals[curr] > 500000) ? 'total-danger' : 'total-success';
             }
             
-            // ဘာသာစကားအလိုက် စုစုပေါင်း စာတန်းပြောင်းလဲခြင်း
             div.innerHTML = `<span class="${colorClass}">🔹 ${curr} ${t.totalSuffix} = ${totals[curr].toLocaleString()} ${curr}</span>`;
             totalArea.appendChild(div);
         }
@@ -388,12 +389,15 @@ function renderExpenses() {
 document.addEventListener('click', function(e) {
     if (!e.target.closest('table') && !e.target.closest('#actionButtonGroup') && !e.target.closest('.form-card') && selectedExpenseId && !isEditMode) {
         selectedExpenseId = null;
-        document.getElementById('actionButtonGroup').style.display = 'none';
+        if(document.getElementById('actionButtonGroup')) document.getElementById('actionButtonGroup').style.display = 'none';
         const allRows = document.querySelectorAll('#expenseList tr');
         allRows.forEach(r => r.classList.remove('selected-row'));
     }
 });
 
-setDefaultDate();
-updateLanguageUI(); // စတင်ချိန်တွင် ဘာသာစကား UI အား တွဲဖက်ဆွဲပေးခြင်း
-renderExpenses();
+// HTML Structure တွေ အကုန်လုံး အပြည့်အဝ Load ဖြစ်ပြီးမှ သေချာပေါက် Run ရန် ညွှန်ကြားခြင်း (Cache Error ကာကွယ်ရန်)
+window.addEventListener('DOMContentLoaded', () => {
+    setDefaultDate();
+    updateLanguageUI();
+    renderExpenses();
+});
