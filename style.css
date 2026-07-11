@@ -172,3 +172,20 @@ tr.selected-row {
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
     margin: 0;
 }
+/* 🚨 တစ်ရက်စာ ၅ သိန်းကျော်ပါက ပြသမည့် စတိုင် */
+.limit-exceeded {
+    color: var(--danger) !important;
+    font-weight: bold;
+}
+
+/* 🔴 တစ်လအတွင်း အသုံးအများဆုံးနေ့အတွက် Highlight စတိုင် */
+.max-day-highlight {
+    background-color: #fee2e2 !important; /* အနီနုရောင် */
+    color: #991b1b !important;
+}
+
+/* 🟢 တစ်လအတွင်း အနည်းဆုံးနေ့အတွက် Highlight စတိုင် */
+.min-day-highlight {
+    background-color: #dcfce7 !important; /* အစိမ်းနုရောင် */
+    color: #166534 !important;
+}
