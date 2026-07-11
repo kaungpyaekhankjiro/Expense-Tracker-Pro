@@ -22,7 +22,7 @@ const translations = {
         optMonth: "လအလိုက် (လချုပ်) ကြည့်မည်",
         labelFilterDate: "ရက်စွဲရွေးရန်:",
         labelFilterMonth: "လရွေးရန်:",
-        thIndex: "อမှတ်စဉ်",
+        thIndex: "အမှတ်စဉ်",
         thDate: "ရက်စွဲ",
         thTitle: "အကြောင်းအရာ",
         thAmount: "ကုန်ကျငွေ",
@@ -154,7 +154,6 @@ function saveToStorage() {
     setDefaultDate();
 }
 
-// 📅 ယနေ့ရက်စွဲစာသားအား YYYY-MM-DD ပုံစံဖြင့် ထုတ်ပေးသည့် Helper Function
 function getTodayDateString() {
     const now = new Date();
     const year = now.getFullYear();
@@ -320,15 +319,9 @@ function renderExpenses() {
     let displayExpenses = [];
     const todayStr = getTodayDateString();
 
-    // ⚡ [LOGIC သစ်] စာရင်းများအား စစ်ထုတ်ခြင်း
     expenses.forEach((exp) => {
-        // ၁။ "Show All Records" ဖြစ်နေပါက ဇယားထဲ၌ ရက်စွဲမရောထွေးစေရန် Default အနေဖြင့် "ယနေ့ရက်စွဲစာရင်း" ကိုသာ ပြသပေးမည်
         if (filterType === 'all' && exp.date !== todayStr) return;
-        
-        // ၂။ ရက်စွဲအလိုက် စစ်ထုတ်ခြင်း
         if (filterType === 'date' && exp.date !== filterDate) return;
-        
-        // ၃။ လအလိုက် (လချုပ်) စစ်ထုတ်ခြင်း
         if (filterType === 'month' && exp.date.substring(0, 7) !== filterMonth) return;
 
         displayExpenses.push(exp);
@@ -338,7 +331,6 @@ function renderExpenses() {
         }
     });
 
-    // တစ်လအတွင်း ရက်စွဲအမျိုးမျိုးရှိပါက အများဆုံး/အနည်းဆုံးနေ့ ရှာဖွေခြင်း
     let maxDay = null, minDay = null;
     let maxAmount = -1, minAmount = Infinity;
     const uniqueDaysCount = Object.keys(dailyTotals).length;
@@ -410,7 +402,7 @@ document.addEventListener('click', function(e) {
 // ==========================================
 // 🔄 PWA AUTO-UPDATE SYSTEM ("Update This" Feature)
 // ==========================================
-const APP_VERSION = "1.0.2"; // ဗားရှင်းကို ၁ တိုးလိုက်သည်
+const APP_VERSION = "1.0.3"; // ဗားရှင်းနံပါတ်အသစ် တိုးလိုက်သည်
 
 function checkAppUpdate() {
     const savedVersion = localStorage.getItem('appVersion');
