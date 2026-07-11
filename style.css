@@ -28,7 +28,7 @@ body {
 .container {
     max-width: 650px;
     margin: 20px auto;
-    padding: 0 15px 90px 15px; /* အောက်ခြေခလုတ်များအတွက် Space ပိုချန်ထားသည် */
+    padding: 0 15px 100px 15px; /* အောက်ခြေခလုတ်တွဲအတွက် Space ပိုချန်ထားသည် */
     box-sizing: border-box;
 }
 
@@ -140,14 +140,14 @@ tr.selected-row {
     margin: 5px 0;
 }
 
-/* 📱 ညာဘက်အောက်ခြေ Floating Button Container စတိုင် */
+/* 📱 ညာဘက်အောက်ခြေ Floating Button Group (ခလုတ်နှစ်ခုလုံးအား 🗑️ ပုံစံအတိုင်း ဝိုင်းစတိုင်လုပ်ခြင်း) */
 #actionButtonGroup {
-    display: none; /* အစပိုင်းတွင် ဖျောက်ထားမည် */
+    display: none; 
     position: fixed;
-    bottom: 20px;
+    bottom: calc(20px + env(safe-area-inset-bottom)); /* iOS Home Bar နှင့် လွတ်စေရန် */
     right: 20px;
     display: flex;
-    gap: 10px;
+    gap: 12px;
     z-index: 999;
 }
 
@@ -155,10 +155,10 @@ tr.selected-row {
     width: auto;
     background-color: var(--danger);
     color: white;
-    padding: 12px 18px;
-    font-size: 14px;
-    border-radius: 50px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    padding: 14px 20px;
+    font-size: 15px;
+    border-radius: 50px; /* ဝိုင်းဝိုင်းလေးဖြစ်စေရန် */
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
     margin: 0;
 }
 
@@ -166,9 +166,9 @@ tr.selected-row {
     width: auto;
     background-color: var(--warning);
     color: white;
-    padding: 12px 18px;
-    font-size: 14px;
-    border-radius: 50px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    padding: 14px 20px;
+    font-size: 15px;
+    border-radius: 50px; /* Delete လိုမျိုး ဝိုင်းဝိုင်းလေးဖြစ်စေရန် */
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
     margin: 0;
 }
