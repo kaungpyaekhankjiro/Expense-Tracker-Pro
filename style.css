@@ -173,18 +173,26 @@ tr.selected-row {
     margin: 0;
 }
 
-/* 🚨 တစ်ရက်စာ ၅ သိန်းကျော်ပါက စာတန်းများကို အနီရောင်တောက်တောက်ပြောင်းရန် */
-.limit-exceeded {
+/* 📊 စုစုပေါင်း 500k ကျော်လျှင်ပြသမည့် အနီရောင်စာတန်းစတိုင် */
+.total-danger {
     color: #dc2626 !important;
+}
+
+/* 📊 စုစုပေါင်း 500k အောက်ဆိုလျှင်ပြသမည့် အစိမ်းရောင်စာတန်းစတိုင် */
+.total-success {
+    color: #16a34a !important;
+}
+
+/* 🔴 တစ်လအတွင်း အသုံးအများဆုံးနေ့ ရက်စွဲကွက်လပ်အတွက် Highlight */
+.max-day-date {
+    background-color: #fee2e2 !important;
+    color: #b91c1c !important;
     font-weight: bold !important;
 }
 
-/* 🔴 တစ်လအတွင်း အသုံးအများဆုံးနေ့အတွက် Background Highlight */
-.max-day-highlight {
-    background-color: #fee2e2 !important;
-}
-
-/* 🟢 一လအတွင်း အနည်းဆုံးနေ့အတွက် Background Highlight */
-.min-day-highlight {
+/* 🟢 တစ်လအတွင်း အနည်းဆုံးနေ့ ရက်စွဲကွက်လပ်အတွက် Highlight */
+.min-day-date {
     background-color: #dcfce7 !important;
+    color: #15803d !important;
+    font-weight: bold !important;
 }
