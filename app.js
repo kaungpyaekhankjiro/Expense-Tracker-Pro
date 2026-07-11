@@ -3,7 +3,7 @@ let selectedExpenseId = null;
 let isEditMode = false;
 let currentLang = localStorage.getItem('appLang') || 'mm';
 
-// 💵 [NEW] နိုင်ငံခြားငွေများကို မြန်မာငွေ ၅ သိန်းကျော်/မကျော် စစ်ဆေးရန် အနီးစပ်ဆုံး ငွေလဲနှုန်းများ (1 Currency = X MMK)
+// 💵 နိုင်ငံခြားငွေများကို မြန်မာငွေပြောင်းလဲစစ်ဆေးရန် အနီးစပ်ဆုံး ငွေလဲနှုန်းများ (1 Currency = X MMK)
 const EXCHANGE_RATES = {
     "Ks": 1,
     "Baht": 120,       // 1 Baht = 120 Ks ဝန်းကျင်
@@ -334,8 +334,11 @@ function renderExpenses() {
     const filterDate = document.getElementById('filterDate').value;
     const filterMonth = document.getElementById('filterMonth').value;
 
+    // ⚡ [NEW] ရက်စွဲများကို အစောဆုံးနေ့မှ နောက်ဆုံးနေ့အထိ အစဉ်လိုက်စီပေးခြင်း (Sorting Logic)
+    expenses.sort((a, b) => new Date(a.date) - new Date(b.date));
+
     let totals = {};
-    let dailyTotalsInMMK = {}; // 💡 တစ်ရက်ချင်းစီ၏ စုစုပေါင်းကုန်ကျငွေကို MMK စျေးဖြင့်ပြောင်းလဲမှတ်သားမည့်အကွက်
+    let dailyTotalsInMMK = {}; 
     let displayExpenses = [];
     const todayStr = getTodayDateString();
 
@@ -346,7 +349,6 @@ function renderExpenses() {
 
         displayExpenses.push(exp);
 
-        // 💡 [NEW SMART LOGIC] မည်သည့် Currency ဖြစ်စေ မြန်မာငွေလဲနှုန်းဖြင့် မြှောက်ပြီး တစ်ရက်စာ စုစုပေါင်း MMK ကို တွက်ချက်သည်
         let rate = EXCHANGE_RATES[exp.currency] || 1;
         let amountInMMK = exp.amount * rate;
         dailyTotalsInMMK[exp.date] = (dailyTotalsInMMK[exp.date] || 0) + amountInMMK;
@@ -396,17 +398,17 @@ function renderExpenses() {
         list.innerHTML = `<tr><td colspan="4" style="text-align:center; color:#64748b; padding:20px;">${t.noData}</td></tr>`;
         totalArea.innerHTML = `<div class="total-item" style="color: #64748b; text-align:center;">${t.noTotal}</div>`;
     } else {
-        // 📊 [NEW LOGIC] သက်ဆိုင်ရာ Currency တစ်ခုချင်းစီအလိုက် စုစုပေါင်းပမာဏကို မြန်မာငွေပြောင်းလဲပြီး ၅ သိန်းကျော်/မကျော် အရောင်ခွဲခြားခြင်း
+        // 📊 [NEW SMART LIMIT DYNAMIC]
         for (let curr in totals) {
             let div = document.createElement('div');
             div.className = "total-item";
             
-            // လက်ရှိ Currency ရဲ့ စုစုပေါင်းပမာဏကို မြန်မာကျပ်ငွေ တန်ဖိုးပြောင်းလဲတွက်ချက်ခြင်း
             let currentRate = EXCHANGE_RATES[curr] || 1;
             let totalInMMK = totals[curr] * currentRate;
             
-            // ၅ သိန်းကျော်ပါက total-danger (အနီ) ၊ ၅ သိန်းအောက်ဆိုပါက total-success (အစိမ်း)
-            let colorClass = (totalInMMK > 500000) ? 'total-danger' : 'total-success';
+            // 💡 [NEW LOGIC] လချုပ် (month) ကြည့်နေချိန်ဆိုလျှင် သိန်း ၅၀ ကျော်မှနီမည်၊ ကျန်ချိန်တွင် ၅ သိန်းကျော်လျှင်နီမည်
+            let limitThreshold = (filterType === 'month') ? 5000000 : 500000;
+            let colorClass = (totalInMMK > limitThreshold) ? 'total-danger' : 'total-success';
             
             div.innerHTML = `<span class="${colorClass}">🔹 ${curr} ${t.totalSuffix} = ${totals[curr].toLocaleString()} ${curr}</span>`;
             totalArea.appendChild(div);
@@ -426,7 +428,7 @@ document.addEventListener('click', function(e) {
 // ==========================================
 // 🔄 PWA AUTO-UPDATE SYSTEM ("Update This" Feature)
 // ==========================================
-const APP_VERSION = "1.0.4"; // ဗားရှင်းနံပါတ်အသစ် တိုးလိုက်သည်
+const APP_VERSION = "1.0.5"; // ဗားရှင်းနံပါတ်အသစ် တိုးလိုက်သည်
 
 function checkAppUpdate() {
     const savedVersion = localStorage.getItem('appVersion');
