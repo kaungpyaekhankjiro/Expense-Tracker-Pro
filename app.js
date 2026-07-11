@@ -6,19 +6,44 @@ function saveToStorage() {
     selectedExpenseId = null;
     document.getElementById('floatingDeleteBtn').style.display = 'none';
     renderExpenses();
-    setDefaultDate(); // စာရင်းသွင်းပြီးရင် ရက်စွဲကို ဒီနေ့ရက်စွဲအဖြစ် ပြန်ထားရန်
+    setDefaultDate();
 }
 
-// 📅 ဖုန်းရဲ့ လက်ရှိ Local ရက်စွဲအတိုင်း (YYYY-MM-DD) ကွက်တိထွက်အောင် ပြင်ဆင်ထားသည့်အပိုင်း
 function setDefaultDate() {
     const dateInput = document.getElementById('dateInput');
-    
     const now = new Date();
     const year = now.getFullYear();
     const month = String(now.getMonth() + 1).padStart(2, '0');
     const day = String(now.getDate()).padStart(2, '0');
-    
     dateInput.value = `${year}-${month}-${day}`;
+}
+
+// 🔎 History Filter အမျိုးအစားအလိုက် Input အကွက်များကို ပေါ်စေ/ဖျောက်စေခြင်း
+function toggleFilterInputs() {
+    const filterType = document.getElementById('filterType').value;
+    const dateArea = document.getElementById('filterDateArea');
+    const monthArea = document.getElementById('filterMonthArea');
+
+    if (filterType === 'date') {
+        dateArea.style.display = 'block';
+        monthArea.style.display = 'none';
+        // ရက်စွဲကွက်လပ်ထဲတွင် ဒီနေ့ရက်စွဲကို Default ထည့်ပေးခြင်း
+        if (!document.getElementById('filterDate').value) {
+            document.getElementById('filterDate').value = document.getElementById('dateInput').value;
+        }
+    } else if (filterType === 'month') {
+        dateArea.style.display = 'none';
+        monthArea.style.display = 'block';
+        // လရွေးချယ်မှုကွက်လပ်ထဲတွင် ယခုလကို Default ထည့်ပေးခြင်း (YYYY-MM)
+        if (!document.getElementById('filterMonth').value) {
+            const today = document.getElementById('dateInput').value;
+            document.getElementById('filterMonth').value = today.substring(0, 7);
+        }
+    } else {
+        dateArea.style.display = 'none';
+        monthArea.style.display = 'none';
+    }
+    renderExpenses(); // Filter ပြောင်းလိုက်တိုင်း ဇယားကို ပြန်ဆွဲရန်
 }
 
 function addExpense() {
@@ -89,15 +114,24 @@ function renderExpenses() {
     list.innerHTML = "";
     totalArea.innerHTML = "";
 
-    let totals = {};
+    const filterType = document.getElementById('filterType').value;
+    const filterDate = document.getElementById('filterDate').value;
+    const filterMonth = document.getElementById('filterMonth').value;
 
-    expenses.forEach((exp, index) => {
+    let totals = {};
+    let displayIndex = 1;
+
+    expenses.forEach((exp) => {
+        // 📊 History Filter စစ်ထုတ်သည့် Logic အပိုင်း
+        if (filterType === 'date' && exp.date !== filterDate) return;
+        if (filterType === 'month' && exp.date.substring(0, 7) !== filterMonth) return;
+
         let row = document.createElement('tr');
         row.style.cursor = 'pointer';
         row.onclick = function() { selectRow(exp.id, this); };
         
         row.innerHTML = `
-            <td>${index + 1}</td>
+            <td>${displayIndex++}</td>
             <td>${exp.date}</td>
             <td>${exp.title}</td>
             <td>${exp.amount.toLocaleString()} ${exp.currency}</td>
@@ -107,7 +141,8 @@ function renderExpenses() {
         totals[exp.currency] = (totals[exp.currency] || 0) + exp.amount;
     });
 
-    if (expenses.length === 0) {
+    if (displayIndex === 1) {
+        list.innerHTML = `<tr><td colspan="4" style="text-align:center; color:#64748b; padding:20px;">ပြသစရာ စာရင်းမရှိသေးပါ</td></tr>`;
         totalArea.innerHTML = `<div class="total-item" style="color: #64748b; text-align:center;">အသုံးစရိတ် မရှိသေးပါ</div>`;
     } else {
         for (let curr in totals) {
@@ -119,6 +154,6 @@ function renderExpenses() {
     }
 }
 
-// App စတင်ချိန်တွင် Run ပေးမည့်အပိုင်း
+// App စတင်ချိန်တွင် Run မည့်အပိုင်း
 setDefaultDate();
 renderExpenses();
