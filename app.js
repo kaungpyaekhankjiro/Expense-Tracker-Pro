@@ -12,7 +12,7 @@ function saveToStorage() {
 function resetActionState() {
     selectedExpenseId = null;
     isEditMode = false;
-    document.getElementById('actionButtonGroup').style.display = 'none'; // ခလုတ်တွဲဖျောက်မည်
+    document.getElementById('actionButtonGroup').style.display = 'none';
     
     document.getElementById('formTitle').innerText = "အချက်အလက်အသစ်ထည့်ရန်";
     const addBtn = document.getElementById('addBtn');
@@ -73,15 +73,12 @@ function addExpense() {
         return;
     }
 
-    // 🛑 [VALIDATION] ဂဏန်းများ သို့မဟုတ် ဂဏန်းများနောက်တွင် k တစ်လုံးတည်းပါဝင်ခြင်း ရှိမရှိ စစ်ဆေးသည်
-    // တခြား မဆိုင်သော စာလုံးများ (ABC, စာသားများ) ရိုက်ထားပါက လက်မခံပါ
     const validPattern = /^[0-9]+(\.[0-9]+)?k?$/;
     if (!validPattern.test(amountStr)) {
         alert("⚠️ ကုန်ကျငွေနေရာတွင် ဂဏန်းများ သို့မဟုတ် အဆုံး၌ 'k' တစ်လုံးတည်းသာ ရိုက်ထည့်ခွင့်ရှိပါတယ်ဗျာ။");
         return;
     }
 
-    // k ပါက 000 အဖြစ် ပြောင်းလဲခြင်း
     if (amountStr.endsWith('k')) {
         amountStr = amountStr.replace('k', '000');
     }
@@ -126,7 +123,7 @@ function selectRow(id, rowElement) {
     } else {
         selectedExpenseId = id;
         rowElement.classList.add('selected-row');
-        btnGroup.style.display = 'flex'; // Edit & Delete ကို တွဲလျက်ပြသမည်
+        btnGroup.style.display = 'flex';
     }
 }
 
@@ -172,21 +169,57 @@ function renderExpenses() {
     const filterMonth = document.getElementById('filterMonth').value;
 
     let totals = {};
-    let displayIndex = 1;
+    let dailyTotals = {}; // တစ်ရက်ချင်းစီ၏ စုစုပေါင်းကုန်ကျငွေ (Limit စစ်ရန်)
+    let displayExpenses = [];
 
+    // ၁။ ပြသမည့် ဒေတာများကို Filter အရင်လုပ်ပြီး တစ်ရက်ချင်းစီအတွက် စုစုပေါင်းတွက်ချက်ခြင်း
     expenses.forEach((exp) => {
         if (filterType === 'date' && exp.date !== filterDate) return;
         if (filterType === 'month' && exp.date.substring(0, 7) !== filterMonth) return;
 
+        displayExpenses.push(exp);
+
+        // Ks ဖြစ်လျှင် တစ်ရက်ချင်းစီအတွက် စုစုပေါင်းပေါင်းထားမည်
+        if (exp.currency === 'Ks') {
+            dailyTotals[exp.date] = (dailyTotals[exp.date] || 0) + exp.amount;
+        }
+    });
+
+    // ၂။ တစ်လအတွင်း (သို့မဟုတ် လက်ရှိမြင်ရသောစာရင်းထဲတွင်) အသုံးအများဆုံးနေ့နှင့် အနည်းဆုံးနေ့ကို ရှာဖွေခြင်း
+    let maxDay = null, minDay = null;
+    let maxAmount = -1, minAmount = Infinity;
+
+    for (let day in dailyTotals) {
+        if (dailyTotals[day] > maxAmount) {
+            maxAmount = dailyTotals[day];
+            maxDay = day;
+        }
+        if (dailyTotals[day] < minAmount) {
+            minAmount = dailyTotals[day];
+            minDay = day;
+        }
+    }
+
+    // ၃။ ဇယားဆွဲခြင်း
+    let displayIndex = 1;
+    displayExpenses.forEach((exp) => {
         let row = document.createElement('tr');
         row.style.cursor = 'pointer';
         row.onclick = function() { selectRow(exp.id, this); };
         
+        // 🚨 ၅ သိန်းကျော်ပါက တပ်ဆင်မည့် Class
+        let limitClass = (exp.currency === 'Ks' && dailyTotals[exp.date] > 500000) ? 'limit-exceeded' : '';
+        
+        // 🔴🟢 တစ်လအတွင်း အနည်း/အများ နေ့ဖြစ်ပါက တပ်ဆင်မည့် Class
+        let highlightClass = '';
+        if (exp.date === maxDay && dailyTotals[exp.date] > 0) highlightClass = 'max-day-highlight';
+        else if (exp.date === minDay && dailyTotals[exp.date] > 0 && Object.keys(dailyTotals).length > 1) highlightClass = 'min-day-highlight';
+
         row.innerHTML = `
-            <td>${displayIndex++}</td>
-            <td>${exp.date}</td>
+            <td class="${highlightClass}">${displayIndex++}</td>
+            <td class="${limitClass} ${highlightClass}">${exp.date}</td>
             <td>${exp.title}</td>
-            <td>${exp.amount.toLocaleString()} ${exp.currency}</td>
+            <td class="${limitClass}">${exp.amount.toLocaleString()} ${exp.currency}</td>
         `;
         list.appendChild(row);
 
