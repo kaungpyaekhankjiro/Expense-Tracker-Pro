@@ -3,6 +3,26 @@ let selectedExpenseId = null;
 let isEditMode = false;
 let currentLang = localStorage.getItem('appLang') || 'mm';
 
+// 💵 [NEW] နိုင်ငံခြားငွေများကို မြန်မာငွေ ၅ သိန်းကျော်/မကျော် စစ်ဆေးရန် အနီးစပ်ဆုံး ငွေလဲနှုန်းများ (1 Currency = X MMK)
+const EXCHANGE_RATES = {
+    "Ks": 1,
+    "Baht": 120,       // 1 Baht = 120 Ks ဝန်းကျင်
+    "USD": 4500,       // 1 USD = 4,500 Ks ဝန်းကျင်
+    "SGD": 3300,       // 1 SGD = 3,300 Ks ဝန်းကျင်
+    "EUR": 4800,       // 1 EUR = 4,800 Ks ဝန်းကျင်
+    "JPY": 28,         // 1 JPY = 28 Ks ဝန်းကျင်
+    "MYR": 950,        // 1 MYR = 950 Ks ဝန်းကျင်
+    "KRW": 3.2,        // 1 KRW = 3.2 Ks ဝန်းကျင်
+    "CNY": 620,        // 1 CNY = 620 Ks ဝန်းကျင်
+    "VND": 0.18,       // 1 VND = 0.18 Ks ဝန်းကျင်
+    "IDR": 0.28,       // 1 IDR = 0.28 Ks ဝန်းကျင်
+    "PHP": 78,         // 1 PHP = 78 Ks ဝန်းကျင်
+    "KHR": 1.1,        // 1 KHR = 1.1 Ks ဝန်းကျင်
+    "LAK": 0.20,       // 1 LAK = 0.20 Ks ဝန်းကျင်
+    "INR": 54,         // 1 INR = 54 Ks ဝန်းကျင်
+    "LKR": 15          // 1 LKR = 15 Ks ဝန်းကျင်
+};
+
 const translations = {
     mm: {
         appTitle: "💰 နေ့စဉ်အသုံးစရိတ် မှတ်တမ်း",
@@ -315,7 +335,7 @@ function renderExpenses() {
     const filterMonth = document.getElementById('filterMonth').value;
 
     let totals = {};
-    let dailyTotals = {}; 
+    let dailyTotalsInMMK = {}; // 💡 တစ်ရက်ချင်းစီ၏ စုစုပေါင်းကုန်ကျငွေကို MMK စျေးဖြင့်ပြောင်းလဲမှတ်သားမည့်အကွက်
     let displayExpenses = [];
     const todayStr = getTodayDateString();
 
@@ -326,23 +346,24 @@ function renderExpenses() {
 
         displayExpenses.push(exp);
 
-        if (exp.currency === 'Ks') {
-            dailyTotals[exp.date] = (dailyTotals[exp.date] || 0) + exp.amount;
-        }
+        // 💡 [NEW SMART LOGIC] မည်သည့် Currency ဖြစ်စေ မြန်မာငွေလဲနှုန်းဖြင့် မြှောက်ပြီး တစ်ရက်စာ စုစုပေါင်း MMK ကို တွက်ချက်သည်
+        let rate = EXCHANGE_RATES[exp.currency] || 1;
+        let amountInMMK = exp.amount * rate;
+        dailyTotalsInMMK[exp.date] = (dailyTotalsInMMK[exp.date] || 0) + amountInMMK;
     });
 
     let maxDay = null, minDay = null;
     let maxAmount = -1, minAmount = Infinity;
-    const uniqueDaysCount = Object.keys(dailyTotals).length;
+    const uniqueDaysCount = Object.keys(dailyTotalsInMMK).length;
 
     if (uniqueDaysCount > 1) {
-        for (let day in dailyTotals) {
-            if (dailyTotals[day] > maxAmount) {
-                maxAmount = dailyTotals[day];
+        for (let day in dailyTotalsInMMK) {
+            if (dailyTotalsInMMK[day] > maxAmount) {
+                maxAmount = dailyTotalsInMMK[day];
                 maxDay = day;
             }
-            if (dailyTotals[day] < minAmount) {
-                minAmount = dailyTotals[day];
+            if (dailyTotalsInMMK[day] < minAmount) {
+                minAmount = dailyTotalsInMMK[day];
                 minDay = day;
             }
         }
@@ -375,14 +396,17 @@ function renderExpenses() {
         list.innerHTML = `<tr><td colspan="4" style="text-align:center; color:#64748b; padding:20px;">${t.noData}</td></tr>`;
         totalArea.innerHTML = `<div class="total-item" style="color: #64748b; text-align:center;">${t.noTotal}</div>`;
     } else {
+        // 📊 [NEW LOGIC] သက်ဆိုင်ရာ Currency တစ်ခုချင်းစီအလိုက် စုစုပေါင်းပမာဏကို မြန်မာငွေပြောင်းလဲပြီး ၅ သိန်းကျော်/မကျော် အရောင်ခွဲခြားခြင်း
         for (let curr in totals) {
             let div = document.createElement('div');
             div.className = "total-item";
             
-            let colorClass = '';
-            if (curr === 'Ks') {
-                colorClass = (totals[curr] > 500000) ? 'total-danger' : 'total-success';
-            }
+            // လက်ရှိ Currency ရဲ့ စုစုပေါင်းပမာဏကို မြန်မာကျပ်ငွေ တန်ဖိုးပြောင်းလဲတွက်ချက်ခြင်း
+            let currentRate = EXCHANGE_RATES[curr] || 1;
+            let totalInMMK = totals[curr] * currentRate;
+            
+            // ၅ သိန်းကျော်ပါက total-danger (အနီ) ၊ ၅ သိန်းအောက်ဆိုပါက total-success (အစိမ်း)
+            let colorClass = (totalInMMK > 500000) ? 'total-danger' : 'total-success';
             
             div.innerHTML = `<span class="${colorClass}">🔹 ${curr} ${t.totalSuffix} = ${totals[curr].toLocaleString()} ${curr}</span>`;
             totalArea.appendChild(div);
@@ -402,7 +426,7 @@ document.addEventListener('click', function(e) {
 // ==========================================
 // 🔄 PWA AUTO-UPDATE SYSTEM ("Update This" Feature)
 // ==========================================
-const APP_VERSION = "1.0.3"; // ဗားရှင်းနံပါတ်အသစ် တိုးလိုက်သည်
+const APP_VERSION = "1.0.4"; // ဗားရှင်းနံပါတ်အသစ် တိုးလိုက်သည်
 
 function checkAppUpdate() {
     const savedVersion = localStorage.getItem('appVersion');
