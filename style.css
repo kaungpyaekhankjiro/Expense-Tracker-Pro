@@ -20,9 +20,35 @@ body {
     background-color: var(--primary);
     color: white;
     text-align: center;
-    padding: 15px 0;
+    padding: 15px 20px;
     padding-top: calc(15px + env(safe-area-inset-top));
     padding-bottom: 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: relative;
+}
+
+.header h2 {
+    margin: 0;
+    font-size: 18px;
+    flex: 1;
+    text-align: left;
+}
+
+.lang-selector-container {
+    width: auto;
+}
+
+.lang-selector-container select {
+    background: #334155;
+    color: white;
+    border: 1px solid #475569;
+    padding: 6px 10px;
+    font-size: 13px;
+    border-radius: 20px;
+    width: auto;
+    cursor: pointer;
 }
 
 .container {
@@ -140,7 +166,6 @@ tr.selected-row {
     margin: 5px 0;
 }
 
-/* 📱 Floating Button Group */
 #actionButtonGroup {
     display: none; 
     position: fixed;
@@ -173,26 +198,7 @@ tr.selected-row {
     margin: 0;
 }
 
-/* 📊 စုစုပေါင်း 500k ကျော်လျှင်ပြသမည့် အနီရောင်စာတန်းစတိုင် */
-.total-danger {
-    color: #dc2626 !important;
-}
-
-/* 📊 စုစုပေါင်း 500k အောက်ဆိုလျှင်ပြသမည့် အစိမ်းရောင်စာတန်းစတိုင် */
-.total-success {
-    color: #16a34a !important;
-}
-
-/* 🔴 တစ်လအတွင်း အသုံးအများဆုံးနေ့ ရက်စွဲကွက်လပ်အတွက် Highlight */
-.max-day-date {
-    background-color: #fee2e2 !important;
-    color: #b91c1c !important;
-    font-weight: bold !important;
-}
-
-/* 🟢 တစ်လအတွင်း အနည်းဆုံးနေ့ ရက်စွဲကွက်လပ်အတွက် Highlight */
-.min-day-date {
-    background-color: #dcfce7 !important;
-    color: #15803d !important;
-    font-weight: bold !important;
-}
+.total-danger { color: #dc2626 !important; }
+.total-success { color: #16a34a !important; }
+.max-day-date { background-color: #fee2e2 !important; color: #b91c1c !important; font-weight: bold !important; }
+.min-day-date { background-color: #dcfce7 !important; color: #15803d !important; font-weight: bold !important; }
