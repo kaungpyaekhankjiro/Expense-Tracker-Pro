@@ -22,7 +22,7 @@ const translations = {
         optMonth: "လအလိုက် (လချုပ်) ကြည့်မည်",
         labelFilterDate: "ရက်စွဲရွေးရန်:",
         labelFilterMonth: "လရွေးရန်:",
-        thIndex: "အမှတ်စဉ်",
+        thIndex: "อမှတ်စဉ်",
         thDate: "ရက်စွဲ",
         thTitle: "အကြောင်းအရာ",
         thAmount: "ကုန်ကျငွေ",
@@ -94,7 +94,7 @@ const translations = {
         thAmount: "จำนวนเงิน",
         totalHeader: "📊 สรุปยอดรวมค่าใช้จ่าย -",
         floatingEditBtn: "✏️ แก้ไข",
-        floatingDeleteBtn: "🗑️ ลบรายการ",
+        floatingDeleteBtn: "ลบรายการ",
         noData: "ไม่มีข้อมูลแสดง",
         noTotal: "ยังไม่มีบันทึกค่าใช้จ่าย",
         totalSuffix: "รวมทั้งหมด",
@@ -109,7 +109,6 @@ function updateLanguageUI() {
     const lang = currentLang;
     const t = translations[lang];
 
-    // Cache ကြောင့် ID တစ်ခုခု ချို့ယွင်းနေပါက ကုဒ်ရပ်မသွားစေရန် အကာအကွယ်ပေးထားခြင်း
     if(document.getElementById('appTitle')) document.getElementById('appTitle').innerHTML = t.appTitle;
     if(document.getElementById('formTitle')) document.getElementById('formTitle').innerText = isEditMode ? t.editFormTitle : t.formTitle;
     if(document.getElementById('labelTitle')) document.getElementById('labelTitle').innerText = t.labelTitle;
@@ -155,6 +154,15 @@ function saveToStorage() {
     setDefaultDate();
 }
 
+// 📅 ယနေ့ရက်စွဲစာသားအား YYYY-MM-DD ပုံစံဖြင့် ထုတ်ပေးသည့် Helper Function
+function getTodayDateString() {
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, '0');
+    const day = String(now.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+}
+
 function resetActionState() {
     selectedExpenseId = null;
     isEditMode = false;
@@ -168,11 +176,7 @@ function resetActionState() {
 function setDefaultDate() {
     const dateInput = document.getElementById('dateInput');
     if(!dateInput) return;
-    const now = new Date();
-    const year = now.getFullYear();
-    const month = String(now.getMonth() + 1).padStart(2, '0');
-    const day = String(now.getDate()).padStart(2, '0');
-    dateInput.value = `${year}-${month}-${day}`;
+    dateInput.value = getTodayDateString();
 }
 
 function toggleFilterInputs() {
@@ -184,14 +188,13 @@ function toggleFilterInputs() {
         dateArea.style.display = 'block';
         monthArea.style.display = 'none';
         if (!document.getElementById('filterDate').value) {
-            document.getElementById('filterDate').value = document.getElementById('dateInput').value;
+            document.getElementById('filterDate').value = getTodayDateString();
         }
     } else if (filterType === 'month') {
         dateArea.style.display = 'none';
         monthArea.style.display = 'block';
         if (!document.getElementById('filterMonth').value) {
-            const today = document.getElementById('dateInput').value;
-            document.getElementById('filterMonth').value = today.substring(0, 7);
+            document.getElementById('filterMonth').value = getTodayDateString().substring(0, 7);
         }
     } else {
         dateArea.style.display = 'none';
@@ -315,9 +318,17 @@ function renderExpenses() {
     let totals = {};
     let dailyTotals = {}; 
     let displayExpenses = [];
+    const todayStr = getTodayDateString();
 
+    // ⚡ [LOGIC သစ်] စာရင်းများအား စစ်ထုတ်ခြင်း
     expenses.forEach((exp) => {
+        // ၁။ "Show All Records" ဖြစ်နေပါက ဇယားထဲ၌ ရက်စွဲမရောထွေးစေရန် Default အနေဖြင့် "ယနေ့ရက်စွဲစာရင်း" ကိုသာ ပြသပေးမည်
+        if (filterType === 'all' && exp.date !== todayStr) return;
+        
+        // ၂။ ရက်စွဲအလိုက် စစ်ထုတ်ခြင်း
         if (filterType === 'date' && exp.date !== filterDate) return;
+        
+        // ၃။ လအလိုက် (လချုပ်) စစ်ထုတ်ခြင်း
         if (filterType === 'month' && exp.date.substring(0, 7) !== filterMonth) return;
 
         displayExpenses.push(exp);
@@ -327,6 +338,7 @@ function renderExpenses() {
         }
     });
 
+    // တစ်လအတွင်း ရက်စွဲအမျိုးမျိုးရှိပါက အများဆုံး/အနည်းဆုံးနေ့ ရှာဖွေခြင်း
     let maxDay = null, minDay = null;
     let maxAmount = -1, minAmount = Infinity;
     const uniqueDaysCount = Object.keys(dailyTotals).length;
@@ -395,37 +407,22 @@ document.addEventListener('click', function(e) {
     }
 });
 
-// HTML Structure တွေ အကုန်လုံး အပြည့်အဝ Load ဖြစ်ပြီးမှ သေချာပေါက် Run ရန် ညွှန်ကြားခြင်း (Cache Error ကာကွယ်ရန်)
-window.addEventListener('DOMContentLoaded', () => {
-    setDefaultDate();
-    updateLanguageUI();
-    renderExpenses();
-});
 // ==========================================
 // 🔄 PWA AUTO-UPDATE SYSTEM ("Update This" Feature)
 // ==========================================
-
-// ဆရာကြီး ကုဒ်အသစ်တင်တိုင်း ဤနံပါတ်ကို ၁ တိုးပေးပါ (ဥပမာ - 1.0.1, 1.0.2)
-const APP_VERSION = "1.0.1"; 
+const APP_VERSION = "1.0.2"; // ဗားရှင်းကို ၁ တိုးလိုက်သည်
 
 function checkAppUpdate() {
     const savedVersion = localStorage.getItem('appVersion');
-    
-    // ဗားရှင်းအသစ် ဖြစ်နေပါက Update ခလုတ်တွဲ ပေါ်လာစေရန် ခိုင်းခြင်း
     if (savedVersion && savedVersion !== APP_VERSION) {
         showUpdateNotification();
     }
-    
-    // လက်ရှိဗားရှင်းကို မှတ်သားထားခြင်း
     localStorage.setItem('appVersion', APP_VERSION);
 }
 
 function showUpdateNotification() {
-    // မျက်နှာပြင် အပေါ်ဆုံးတွင် Update Banner လေး တစ်ခါတည်း ဆောက်ပြီး ပြသခြင်း
     const updateBanner = document.createElement('div');
     updateBanner.id = "updateBanner";
-    
-    // ဘာသာစကားအလိုက် စာသားပြောင်းလဲခြင်း
     const msg = currentLang === 'en' ? "🔄 New update available!" : currentLang === 'th' ? "🔄 มีเวอร์ชันใหม่พร้อมใช้งาน!" : "🔄 ဗားရှင်းအသစ် ရရှိနိုင်ပါပြီ!";
     const btnText = currentLang === 'en' ? "Update This" : currentLang === 'th' ? "อัปเดตตอนนี้" : "ယခုဗားရှင်းမြှင့်မည် (Update This)";
 
@@ -439,17 +436,17 @@ function showUpdateNotification() {
 }
 
 function applyAppUpdate() {
-    // Cache များကို ရာနှုန်းပြည့် ရှင်းလင်းပြီး App အား Hard Reload လုပ်ပစ်ခြင်း
     if ('caches' in window) {
         caches.keys().then(names => {
             for (let name of names) caches.delete(name);
         });
     }
-    // Website အား အသစ်ပြန်ဖွင့်ခြင်း
     window.location.reload(true);
 }
 
-// Dom Loaded တွင် Update ရှိမရှိ စစ်ဆေးခိုင်းခြင်း
 window.addEventListener('DOMContentLoaded', () => {
+    setDefaultDate();
+    updateLanguageUI();
+    renderExpenses();
     checkAppUpdate();
 });
