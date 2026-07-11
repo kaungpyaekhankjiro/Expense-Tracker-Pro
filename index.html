@@ -20,7 +20,7 @@
     <div class="container">
         <!-- Input Form -->
         <div class="form-card">
-            <h3>အချက်အလက်အသစ်ထည့်ရန်</h3>
+            <h3 id="formTitle">အချက်အလက်အသစ်ထည့်ရန်</h3>
             <div class="input-group">
                 <label>အသုံးပြုသည့် အကြောင်းအရာ:</label>
                 <input type="text" id="titleInput" placeholder="ဥပမာ - စျေးဝယ်ခြင်း">
@@ -45,10 +45,11 @@
                     </select>
                 </div>
             </div>
+            <!-- Edit လုပ်ချိန်တွင် ခလုတ်စာသား ပြောင်းလဲနိုင်ရန် ID တပ်ထားသည် -->
             <button id="addBtn" onclick="addExpense()">➕ အသစ်ထည့်မည် (Add)</button>
         </div>
 
-        <!-- 🔎 ဤအကွက်သည် အသစ်တိုးလာသော History Filter (လချုပ်/ရက်ချုပ်) စနစ် ဖြစ်သည် -->
+        <!-- History Filter -->
         <div class="form-card" style="background: #eff6ff; border: 1px solid #bfdbfe;">
             <h3>📊 စာရင်းများ ပြန်လည်ကြည့်ရှုရန် (History)</h3>
             <div class="amount-row">
@@ -95,8 +96,11 @@
         </div>
     </div>
 
-    <!-- Floating Delete Button -->
-    <button id="floatingDeleteBtn" onclick="deleteSelectedExpense()">🗑️ ဖျက်ရန် (Delete)</button>
+    <!-- 📱 ညာဘက်အောက်ခြေတွင် အတူတူ Float ဖြစ်နေမည့် Edit နှင့် Delete ခလုတ်တွဲ -->
+    <div id="actionButtonGroup">
+        <button id="floatingEditBtn" onclick="editSelectedExpense()">✏️ ပြင်ဆင်ရန် (Edit)</button>
+        <button id="floatingDeleteBtn" onclick="deleteSelectedExpense()">🗑️ ဖျက်ရန် (Delete)</button>
+    </div>
 
     <script src="app.js"></script>
 </body>
